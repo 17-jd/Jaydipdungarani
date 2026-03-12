@@ -1,81 +1,39 @@
-import { useEffect } from "react";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import HoverLinks from "./HoverLinks";
-import { gsap } from "gsap";
-import { ScrollSmoother } from "gsap/ScrollSmoother";
-import "./styles/Navbar.css";
-
-gsap.registerPlugin(ScrollSmoother, ScrollTrigger);
-export let smoother: ScrollSmoother;
+import { useEffect, useState } from 'react'
+import { TbFileDownload } from 'react-icons/tb'
 
 const Navbar = () => {
+  const [scrolled, setScrolled] = useState(false)
+
   useEffect(() => {
-    smoother = ScrollSmoother.create({
-      wrapper: "#smooth-wrapper",
-      content: "#smooth-content",
-      smooth: 1.7,
-      speed: 1.7,
-      effects: true,
-      autoResize: true,
-      ignoreMobileResize: true,
-    });
+    const onScroll = () => setScrolled(window.scrollY > 40)
+    window.addEventListener('scroll', onScroll)
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
-    smoother.scrollTop(0);
-    smoother.paused(true);
+  const scrollTo = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+  }
 
-    let links = document.querySelectorAll(".header ul a");
-    links.forEach((elem) => {
-      let element = elem as HTMLAnchorElement;
-      element.addEventListener("click", (e) => {
-        if (window.innerWidth > 1024) {
-          e.preventDefault();
-          let elem = e.currentTarget as HTMLAnchorElement;
-          let section = elem.getAttribute("data-href");
-          smoother.scrollTo(section, true, "top top");
-        }
-      });
-    });
-    window.addEventListener("resize", () => {
-      ScrollSmoother.refresh(true);
-    });
-  }, []);
   return (
-    <>
-      <div className="header">
-        <a href="/#" className="navbar-title" data-cursor="disable">
-          JD
-        </a>
-        <a
-          href="mailto:dungarani.j@northeastern.edu"
-          className="navbar-connect"
-          data-cursor="disable"
-        >
-          dungarani.j@northeastern.edu
-        </a>
-        <ul>
+    <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
+      <div className="container">
+        <span className="nav-logo">jd.dev</span>
+        <ul className="nav-links">
+          <li><a onClick={() => scrollTo('about')} style={{ cursor: 'pointer' }}>About</a></li>
+          <li><a onClick={() => scrollTo('experience')} style={{ cursor: 'pointer' }}>Experience</a></li>
+          <li><a onClick={() => scrollTo('skills')} style={{ cursor: 'pointer' }}>Skills</a></li>
+          <li><a onClick={() => scrollTo('projects')} style={{ cursor: 'pointer' }}>Projects</a></li>
+          <li><a onClick={() => scrollTo('contact')} style={{ cursor: 'pointer' }}>Contact</a></li>
           <li>
-            <a data-href="#about" href="#about">
-              <HoverLinks text="ABOUT" />
-            </a>
-          </li>
-          <li>
-            <a data-href="#work" href="#work">
-              <HoverLinks text="WORK" />
-            </a>
-          </li>
-          <li>
-            <a data-href="#contact" href="#contact">
-              <HoverLinks text="CONTACT" />
+            <a href="/Jaydip_resume.pdf" target="_blank" className="nav-resume">
+              <TbFileDownload style={{ verticalAlign: 'middle', marginRight: '4px' }} />
+              Resume
             </a>
           </li>
         </ul>
       </div>
+    </nav>
+  )
+}
 
-      <div className="landing-circle1"></div>
-      <div className="landing-circle2"></div>
-      <div className="nav-fade"></div>
-    </>
-  );
-};
-
-export default Navbar;
+export default Navbar
